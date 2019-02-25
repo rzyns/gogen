@@ -14,9 +14,9 @@ func Test_StructTag_String(t *testing.T) {
 
 	assertStringsEqual(t, actual, expected)
 
-	st = gen.NewStructTag().WithValue("json", "", "").WithValue("json", "omitempty", "")
+	st.WithValue("json", "", "").WithValue("json", "omitempty", "")
 
-	expected = `json:", omitempty"`
+	expected = expected + ` json:", omitempty"`
 	actual = st.String()
 
 	assertStringsEqual(t, actual, expected)

@@ -49,7 +49,7 @@ func (s *Struct) String() string {
 type StructTag struct {
 	props       map[string]map[string]string
 	propKeys    []string
-	propSubKeys []string
+	propSubKeys map[string][]string
 }
 
 // NewStructTag initializes a struct tag
@@ -57,7 +57,7 @@ func NewStructTag() *StructTag {
 	return &StructTag{
 		props:       make(map[string]map[string]string),
 		propKeys:    make([]string, 0, 1),
-		propSubKeys: make([]string, 0, 1),
+		propSubKeys: make(map[string][]string),
 	}
 }
 
@@ -69,8 +69,12 @@ func (s *StructTag) WithValue(tag, key, value string) *StructTag {
 		s.propKeys = append(s.propKeys, tag)
 	}
 
+	if _, exists := s.propSubKeys[tag]; !exists {
+		s.propSubKeys[tag] = make([]string, 0, 1)
+	}
+
 	if _, exists := s.props[tag][key]; !exists {
-		s.propSubKeys = append(s.propSubKeys, key)
+		s.propSubKeys[tag] = append(s.propSubKeys[tag], key)
 	}
 
 	s.props[tag][key] = value
@@ -84,7 +88,7 @@ func (s *StructTag) String() string {
 	for _, propKey := range s.propKeys {
 		values := make([]string, 0, len(s.props[propKey]))
 
-		for _, propSubKey := range s.propSubKeys {
+		for _, propSubKey := range s.propSubKeys[propKey] {
 			value := s.props[propKey][propSubKey]
 			if len(value) > 0 {
 				values = append(values, fmt.Sprintf("%s=%s", propSubKey, value))
